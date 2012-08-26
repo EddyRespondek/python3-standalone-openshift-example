@@ -1,0 +1,41 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc
+
+OPENSHIFT_BIN=${OPENSHIFT_RUNTIME_DIR}bin/
+export PATH=${OPENSHIFT_BIN}:$PATH
+
+PYTHON_VERSION=3.2.3
+PYTHON_FILE=Python-${PYTHON_VERSION}.tar.bz2
+PYTHON_URL=http://www.python.org/ftp/python/${PYTHON_VERSION}/${PYTHON_FILE}
+PYTHON_TMP=${OPENSHIFT_TMP_DIR}python/
+
+DISTRIBUTE_URL=http://python-distribute.org/distribute_setup.py
+
+cd ${OPENSHIFT_TMP_DIR}
+
+rm -rf ${PYTHON_TMP}
+mkdir -p ${PYTHON_TMP}
+
+wget -nc ${PYTHON_URL} -P ${OPENSHIFT_TMP_DIR}
+tar -jxf ${OPENSHIFT_TMP_DIR}${PYTHON_FILE} -C ${PYTHON_TMP} --strip-components 1
+
+cd ${PYTHON_TMP}
+
+./configure --prefix=${OPENSHIFT_RUNTIME_DIR}
+make -C ${PYTHON_TMP}
+make install -C ${PYTHON_TMP}
+
+ln -s python3 ${OPENSHIFT_BIN}python
+
+cd ${OPENSHIFT_TMP_DIR}
+
+wget -nc ${DISTRIBUTE_URL} -P ${OPENSHIFT_TMP_DIR}
+${OPENSHIFT_BIN}python3 distribute_setup.py
+
+cd ${OPENSHIFT_BIN}
+
+easy_install pip
+pip install virtualenv
