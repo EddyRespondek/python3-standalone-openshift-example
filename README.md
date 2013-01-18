@@ -25,7 +25,7 @@ Then push the repo upstream
 
 That's it, just ssh into your application and run command
 
-    export PATH=${OPENSHIFT_RUNTIME_DIR}bin/:$PATH
+    export PATH=${OPENSHIFT_DATA_DIR}bin/:$PATH
 
 and make sure everything is working
 
